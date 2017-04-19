@@ -19,10 +19,12 @@ function html_encode(str) {
     }
 }
 
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
     res.set('X-XSS-Protection', 0);
     res.render('index', { title: 'Express', xss: req.query.xss });
+    // 例如 xss=<img%20src="null"%20onerror="alert(1)">
 });
 
 router.get('/comment', function(req, res, next) {
