@@ -224,12 +224,15 @@
 	};
 
 	var decode = function(html, options) {
+		// console.log(this);
+		// console.log(html);
 		options = merge(options, decode.options);
 		var strict = options.strict;
 		if (strict && regexInvalidEntity.test(html)) {
 			parseError('malformed character reference');
 		}
 		return html.replace(regexDecode, function($0, $1, $2, $3, $4, $5, $6, $7) {
+			// console.log('regexDecode', regexDecode);
 			var codePoint;
 			var semicolon;
 			var decDigits;
@@ -290,6 +293,7 @@
 					);
 				}
 				// Note: there is no need to check `has(decodeMapLegacy, reference)`.
+				console.log(decodeMapLegacy[reference] + (next || ''));
 				return decodeMapLegacy[reference] + (next || '');
 			}
 		});

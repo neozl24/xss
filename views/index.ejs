@@ -17,6 +17,7 @@
         <p>sks<img src="null" alt="" onerror="alert('error')"></p>
     </textarea>
 
+    <br>
     <button type="button" name="button" id="btn">评论</button>
     <button type="button" name="button" id="get-btn">获取评论</button>
 
@@ -51,6 +52,7 @@
                         var com = parse(JSON.parse(xhr.response).comment);
                         var txt = document.createElement('span');
                         txt.innerHTML = com;
+                        document.body.appendChild(txt);
                     } else {
                         console.log('error');
                     }
@@ -59,15 +61,21 @@
             xhr.send();
         });
 
+        // 将用户输入的文本进行简单的反转义以后，再用innerHTML去包含，那么其中的XSS脚本会得到执行
+        // 所以我们不能直接用模版去反转义，需要先将文本转成 DOM对象，在这个过程中进行 DOM的配对和校验
         function parse(str) {
-            var result = '';
+            var results = '';
             try {
-                HTMLParse(he.unescape(str, {strict: true}), {
+                HTMLParser(he.unescape(str, {strict: true}), {
                     start: function(tag, attrs, unary) {
+                        if(tag=='script'||tag=='style'||tag=='link'||tag=='iframe'||tag=='frame')return;
                         results += '<' + tag;
-                        for (var i = 0; i < attrs.length; i++) {
-                            results += ' ' + attrs[i].name + '="' + attrs[i].escaped + '"';
-                        }
+
+                        // 将下面的代码注释掉之后，将属性过滤之后，也就拦截了藏在其中的XSS脚本
+                        // for (var i = 0; i < attrs.length; i++) {
+                        //     results += ' ' + attrs[i].name + '="' + attrs[i].escaped + '"';
+                        // }
+
                         results += (unary?"/":"") + ">";
                     },
                     end: function(tag) {
